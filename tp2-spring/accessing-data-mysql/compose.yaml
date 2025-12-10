@@ -1,0 +1,10 @@
+mysql:
+  container_name: 'guide-mysql'
+  image: 'mysql:latest'
+  environment:
+    - 'MYSQL_DATABASE=tp2db'
+    - 'MYSQL_PASSWORD=iutinfo'
+    - 'MYSQL_ROOT_PASSWORD=$iutinfo'
+    - 'MYSQL_USER=tp2'
+  ports:
+    - '3306:3306'
