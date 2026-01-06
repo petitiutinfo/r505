@@ -1,35 +1,53 @@
-package com.example.accessing_data_mysql;;
+package com.example.accessing_data_mysql;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.List;
 
-@Controller
-@RequestMapping(path="/demo")
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/users")
 public class MainController {
-    @Autowired
-    private UserRepository userRepository;
-    @GetMapping("/")
-    @ResponseBody
-    public String home() {
-        return "API OK - utilisez /demo/add ou /demo/all";
+
+    private final UserRepository userRepository;
+
+    public MainController(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    @GetMapping(path="/add")
-    public @ResponseBody String addNewUser() {
-        User n = new User();
-        n.setName("Test");
-        n.setEmail("test@test.com");
-        userRepository.save(n);
-        return "Saved";
+    // CREATE
+    @PostMapping
+    public User createUser(@RequestBody User user) {
+        return userRepository.save(user);
     }
 
-    @GetMapping(path="/all")
-    public @ResponseBody Iterable<User> getAllUsers() {
+    // READ ALL
+    @GetMapping
+    public Iterable<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    // READ ONE
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Integer id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    // UPDATE
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable Integer id, @RequestBody User updatedUser) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setName(updatedUser.getName());
+        user.setEmail(updatedUser.getEmail());
+
+        return userRepository.save(user);
+    }
+
+    // DELETE
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Integer id) {
+        userRepository.deleteById(id);
     }
 }
